@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Französisch lernen</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 700px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+}
+
+#word {
+    font-size: 32px;
+    margin: 30px 0;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    background: #3498db;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+#result {
+    font-size: 24px;
+    margin-top: 20px;
+    min-height: 30px;
+}
+
+#score {
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🇫🇷 Französisch lernen</h1>
+
+<h2 id="word"></h2>
+
+<button id="btn0"></button>
+<button id="btn1"></button>
+<button id="btn2"></button>
+
+<p id="result"></p>
+
+<p>Punkte: <span id="score">0</span></p>
+
+</div>
+
+<script>
+
+const questions = [
+{
+word: "das Kino",
+answers: ["le cinéma","le vampire","la pomme"],
+correct: 0
+}
+];
+
+let current = 0;
+let score = 0;
+
+function loadQuestion() {
+
+document.getElementById("word").textContent =
+questions[current].word;
+
+for(let i = 0; i < 3; i++) {
+document.getElementById("btn" + i).textContent =
+questions[current].answers[i];
+}
+
+document.getElementById("result").textContent = "";
+}
+
+function checkAnswer(choice) {
+
+if(choice === questions[current].correct){
+score++;
+document.getElementById("result").textContent = "✅ Richtig!";
+}
+else{
+document.getElementById("result").textContent = "❌ Falsch!";
+}
+
+document.getElementById("score").textContent = score;
+
+current++;
+
+if(current < questions.length){
+setTimeout(loadQuestion, 1000);
+}
+else{
+setTimeout(() => {
+document.querySelector(".container").innerHTML = `
+<h1>Test beendet!</h1>
+<h2>Dein Ergebnis: ${score}/${questions.length}</h2>
+<button onclick="location.reload()">Neu starten</button>
+`;
+}, 1000);
+}
+}
+
+document.getElementById("btn0").onclick = () => checkAnswer(0);
+document.getElementById("btn1").onclick = () => checkAnswer(1);
+document.getElementById("btn2").onclick = () => checkAnswer(2);
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
