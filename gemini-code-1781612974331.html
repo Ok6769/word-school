@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dis Donc! – Französisch lernen</title>
+
+<style>
+
+*{box-sizing:border-box;}
+
+body{
+    margin:0;
+    padding:20px;
+    font-family:Arial,sans-serif;
+    background:#fff8f1;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    width:400px;
+    height:400px;
+    border-radius:50%;
+    background:#ff8c1a;
+    top:-180px;
+    left:-180px;
+    opacity:0.25;
+    z-index:-1;
+}
+
+body::after{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:#ff8c1a;
+    bottom:-250px;
+    right:-250px;
+    opacity:0.25;
+    z-index:-1;
+}
+
+.container{
+    max-width:800px;
+    margin:40px auto;
+    background:white;
+    border-radius:25px;
+    padding:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+/* Расширяем контейнер специально для сетки карточек, чтобы они смотрелись просторнее */
+.container.wide-mode {
+    max-width: 950px;
+}
+
+h1{color:#ff7a00;margin-bottom:10px;margin-top:0;}
+
+.subtitle{color:#666;margin-bottom:30px;}
+
+.progress-text{font-size:18px;margin-bottom:10px;color:#555;}
+
+.progress-bar{
+    width:100%;
+    height:18px;
+    background:#eee;
+    border-radius:50px;
+    overflow:hidden;
+    margin-bottom:30px;
+    position: relative;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:#ff8c1a;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+    background-size: 40px 40px;
+    animation: progressMoving 2s linear infinite;
+}
+
+#word{
+    font-size:36px;
+    margin:30px 0;
+    color:#333;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.answer-btn{
+    width:100%;
+    padding:16px;
+    margin:10px 0;
+    border:none;
+    border-radius:15px;
+    font-size:18px;
+    cursor:pointer;
+    background:#ff8c1a;
+    color:white;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, box-shadow 0.2s;
+}
+
+.answer-btn:hover{
+    transform: translateY(-2px);
+    background:#ff7700;
+    box-shadow: 0 5px 15px rgba(255, 122, 0, 0.3);
+}
+
+.answer-btn:active {
+    transform: translateY(0);
+}
+
+.correct{
+    background:#2ecc71 !important;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4) !important;
+}
+.wrong{
+    background:#e74c3c !important;
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4) !important;
+}
+
+.input-box{
+    width:100%;
+    padding:16px;
+    font-size:18px;
+    border-radius:12px;
+    border:2px solid #ddd;
+    margin-top:10px;
+    outline:none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-box:focus{
+    border-color:#ff8c1a;
+    box-shadow: 0 0 8px rgba(255, 140, 26, 0.2);
+}
+
+.restart-btn{
+    background:#ff8c1a;
+    color:white;
+    border:none;
+    border-radius:15px;
+    padding:16px 25px;
+    font-size:20px;
+    cursor:pointer;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.restart-btn:hover{
+    background:#ff7700;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 122, 0, 0.3);
+}
+
+.french-keyboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.char-btn {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #333;
+    transition: all 0.15s ease;
+    min-width: 38px;
+    text-align: center;
+}
+
+.char-btn:hover {
+    background: #ff8c1a;
+    color: white;
+    border-color: #ff8c1a;
+    transform: translateY(-1px);
+}
+
+.score-box {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+/* Стили для начального экрана */
+.mode-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.mode-btn {
+    background: white;
+    border: 3px solid #ff8c1a;
+    color: #ff8c1a;
+    border-radius: 20px;
+    padding: 25px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.mode-btn span {
+    display: block;
+    font-size: 15px;
+    color: #777;
+    font-weight: normal;
+    margin-top: 5px;
+}
+
+.mode-btn:hover {
+    background: #ff8c1a;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 140, 26, 0.2);
+}
+
+.mode-btn:hover span {
+    color: #fffbc4;
+}
+
+/* Стили для игры в карточки (4x3 сетка) */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.card {
+    background: #fff;
+    border: 2px solid #ff8c1a;
+    border-radius: 15px;
+    padding: 20px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    transition: all 0.2s ease;
+    user-select: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 140, 26, 0.15);
+}
+
+.card.selected {
+    background: #ffe3cc;
+    border-color: #ff7700;
+    transform: scale(1.02);
+}
+
+.card.correct {
+    background: #2ecc71;
+    border-color: #2ecc71;
+    color: white;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    transition: all 0.4s ease;
+}
+
+.card.wrong {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes progressMoving {
+    from { background-position: 0 0; }
+    to { background-position: 40px 0; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container" id="gameContainer">
+    <!-- При загрузке страницы всегда рендерится главное меню -->
+    <h1>🇫🇷 Dis Donc!</h1>
+    <div class="subtitle">Wähle einen Spielmodus aus:</div>
+    
+    <div class="mode-selection">
+        <button class="mode-btn" onclick="startClassicQuiz()">
+            📝 Klassischer Test
+            <span>Drei Stufen: Multiple-Choice, Deutsch-Eingabe und Französisch-Eingabe.</span>
+        </button>
+        
+        <button class="mode-btn" onclick="startCardsGame()">
+            🃏 Karten-Spiel (Quizlet-Style)
+            <span>Finde die Paare! Verbinde deutsche und französische Begriffe in einer 4x3 Matrix.</span>
+        </button>
+    </div>
+</div>
+
+<script>
+
+// Наш массив слов (Все Nomen с большой буквы и только der/die/das)
+const questions = [
+["das Kino","le cinéma"],
+["die Spinne","une araignée"],
+["der Feind","un ennemi"],
+["flink","agile"],
+["zuverlässig","fiable"],
+["der Ritter","le chevalier"],
+["mutig","courageux"],
+["der Mut","le courage"],
+["ehrlich","honnête"],
+["grausam","cruel"],
+["böse","méchant"],
+["die Hexe","la sorcière"],
+["eifersüchtig","jaloux"],
+["der Vampir","le vampire"],
+["unsterblich","immortel"],
+["ehrgeizig","ambitieux"],
+["der Held","le héros"],
+["riesig","géant"],
+["schön","beau"],
+["gewalttätig","violent"]
+];
+
+let current = 0;
+let score = 0;
+let mode = 1; 
+const MAX = 20;
+
+// Переменные для режима карточек
+let firstSelected = null;
+let secondSelected = null;
+let matchesFound = 0;
+
+/* --- ВОЗВРАТ В ГЛАВНОЕ МЕНЮ --- */
+function backToMenu() {
+    const container = document.getElementById("gameContainer");
+    container.classList.remove("wide-mode"); // Сбрасываем широкую сетку, если уходили из карточек
+    container.innerHTML = `
+        <h1>🇫🇷 Dis Donc!</h1>
+        <div class="subtitle">Wähle einen Spielmodus aus:</div>
+        
+        <div class="mode-selection">
+            <button class="mode-btn" onclick="startClassicQuiz()">
+                📝 Klassischer Test
+                <span>Drei Stufen: Multiple-Choice, Deutsch-Eingabe und Französisch-Eingabe.</span>
+            </button>
+            
+            <button class="mode-btn" onclick="startCardsGame()">
+                🃏 Karten-Spiel (Quizlet-Style)
+                <span>Finde die Paare! Verbinde deutsche und französische Begriffe in einer 4x3 Matrix.</span>
+            </button>
+        </div>
+    `;
+}
+
+/* ========================================================= */
+/*                   РЕЖИМ 1: КЛАССИЧЕСКИЙ ТЕСТ              */
+/* ========================================================= */
+
+function startClassicQuiz() {
+    current = 0;
+    score = 0;
+    mode = 1;
+    
+    document.getElementById("gameContainer").innerHTML = `
+        <h1>🇫🇷 Dis Donc!</h1>
+        <div class="subtitle">Französische Wörter lernen</div>
+        <div class="progress-text" id="progressText">Frage 1 von 20</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div id="word"></div>
+        <div id="answers"></div>
+        <div id="result"></div>
+        <div class="score-box" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Punkte: <span id="score">0</span></span>
+            <button class="restart-btn" style="font-size:14px; padding:8px 15px; margin:0;" onclick="backToMenu()">↩ Menü</button>
+        </div>
+    `;
+    questions.sort(() => Math.random() - 0.5);
+    loadQuestion();
+}
+
+function updateProgress(){
+    const pf = document.getElementById("progressFill");
+    const pt = document.getElementById("progressText");
+    if(pf && pt) {
+        pf.style.width = (current / MAX) * 100 + "%";
+        pt.textContent = `Frage ${current + 1} von ${MAX}`;
+    }
+}
+
+function loadQuestion(){
+    updateProgress();
+    document.getElementById("result").textContent = "";
+
+    const [de, fr] = questions[current];
+    const word = (mode === 1 || mode === 3) ? de : fr;
+    const correct = (mode === 1 || mode === 3) ? fr : de;
+
+    document.getElementById("word").textContent = word;
+    const answers = document.getElementById("answers");
+    answers.innerHTML = "";
+
+    if(mode === 1){
+        let options = [correct];
+        while(options.length < 4){
+            let r = questions[Math.floor(Math.random()*questions.length)][1];
+            if(!options.includes(r)) options.push(r);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "answer-btn";
+            btn.textContent = opt;
+            btn.onclick = () => {
+                document.querySelectorAll(".answer-btn").forEach(b => b.disabled = true);
+                if(opt === correct){
+                    btn.classList.add("correct");
+                    document.getElementById("result").textContent = "✅ Richtig!";
+                    score++;
+                } else {
+                    btn.classList.add("wrong");
+                    document.querySelectorAll(".answer-btn").forEach(b=>{
+                        if(b.textContent === correct) b.classList.add("correct");
+                    });
+                    document.getElementById("result").textContent = "❌ Falsch!";
+                }
+                document.getElementById("score").textContent = score;
+                current++;
+                setTimeout(()=>{
+                    if(current < MAX) loadQuestion();
+                    else showContinue(2); 
+                },1200);
+            };
+            answers.appendChild(btn);
+        });
+    }
+    else {
+        const input = document.createElement("input");
+        input.className = "input-box";
+        input.placeholder = "Schreibe die Übersetzung...";
+
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = "Prüfen";
+
+        function clean(text, currentMode){
+            if (currentMode === 2) {
+                let cleared = text.replace(/\b(der|die|das)\b/gi, "").replace(/\s+/g," ").trim();
+                if(cleared.length > 0) {
+                    cleared = cleared.charAt(0).toUpperCase() + cleared.slice(1);
+                }
+                return cleared;
+            } else {
+                return text.toLowerCase().trim();
+            }
+        }
+
+        function check(){
+            const user = clean(input.value, mode);
+            const correctClean = clean(correct, mode);
+
+            document.querySelectorAll(".answer-btn").forEach(b => b.disabled = true);
+
+            if(user === correctClean){
+                input.style.border = "2px solid #2ecc71";
+                input.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
+                document.getElementById("result").textContent = "✅ Richtig!";
+                score++;
+            } else {
+                input.style.border = "2px solid #e74c3c";
+                input.style.boxShadow = "0 0 10px rgba(231, 76, 60, 0.3)";
+                document.getElementById("result").textContent = "❌ Falsch! Richtig: " + correct;
+            }
+
+            document.getElementById("score").textContent = score;
+            current++;
+
+            setTimeout(()=>{
+                if(current < MAX) loadQuestion();
+                else {
+                    if(mode === 2) showContinue(3); 
+                    else finishQuiz(); 
+                }
+            },1200);
+        }
+
+        btn.onclick = check;
+        input.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); });
+
+        if(mode === 3) {
+            const keyboardContainer = document.createElement("div");
+            keyboardContainer.className = "french-keyboard";
+            
+            // Добавлена слитная буква œ
+            const frenchChars = ["é", "è", "à", "ç", "œ", "ù", "â", "ê", "î", "ô", "û", "ë", "ï"];
+            
+            frenchChars.forEach(char => {
+                const charBtn = document.createElement("button");
+                charBtn.className = "char-btn";
+                charBtn.type = "button";
+                charBtn.textContent = char;
+                
+                charBtn.onclick = (e) => {
+                    e.preventDefault();
+                    const startPos = input.selectionStart;
+                    const endPos = input.selectionEnd;
+                    const text = input.value;
+                    
+                    input.value = text.substring(0, startPos) + char + text.substring(endPos);
+                    input.selectionStart = input.selectionEnd = startPos + 1;
+                    input.focus();
+                };
+                keyboardContainer.appendChild(charBtn);
+            });
+            answers.appendChild(keyboardContainer);
+        }
+
+        answers.appendChild(input);
+        answers.appendChild(btn);
+        input.focus();
+    }
+}
+
+function showContinue(nextMode){
+    let title = "";
+    let subtitle = "";
+    let btnClick = "";
+
+    if(nextMode === 2) {
+        title = "🔥 Teil 1 fertig!";
+        subtitle = "Jetzt kommt Teil 2 (Eingabe auf Deutsch)";
+        btnClick = "startStage2()";
+    } else if(nextMode === 3) {
+        title = "🔥 Teil 2 fertig!";
+        subtitle = "Jetzt kommt Teil 3 (Eingabe auf Französisch)";
+        btnClick = "startStage3()";
+    }
+
+    document.getElementById("gameContainer").innerHTML = `
+        <h1>${title}</h1>
+        <p>${subtitle}</p>
+        <button class="restart-btn" onclick="${btnClick}">Weiter ▶</button>
+    `;
+}
+
+function startStage2(){
+    current = 0; mode = 2;
+    setupStageHeader("Teil 2: Eingabe auf Deutsch");
+    loadQuestion();
+}
+
+function startStage3(){
+    current = 0; mode = 3;
+    setupStageHeader("Teil 3: Eingabe auf Französisch");
+    loadQuestion();
+}
+
+function setupStageHeader(titleString) {
+    document.getElementById("gameContainer").innerHTML = `
+        <h1>🇫🇷 Dis Donc!</h1>
+        <div class="subtitle">${titleString}</div>
+        <div class="progress-text" id="progressText"></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div id="word"></div>
+        <div id="answers"></div>
+        <div id="result"></div>
+        <div class="score-box" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Punkte: <span id="score">${score}</span></span>
+            <button class="restart-btn" style="font-size:14px; padding:8px 15px; margin:0;" onclick="backToMenu()">↩ Menü</button>
+        </div>
+    `;
+}
+
+function finishQuiz(){
+    const percent = Math.round(score/(MAX*3)*100);
+    let msg = percent>=90?"🏆 Fantastisch!":percent>=70?"🥈 Sehr gut!":percent>=50?"👍 Gut!":"📚 Weiter üben!";
+
+    document.getElementById("gameContainer").innerHTML = `
+        <h1>🎉 Fertig!</h1>
+        <h2>${msg}</h2>
+        <h1>${score}/${MAX*3}</h1>
+        <p>${percent}% richtig</p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="restart-btn" onclick="startClassicQuiz()">Neu starten 🔄</button>
+            <button class="restart-btn" style="background:#666;" onclick="backToMenu()">Hauptmenü 🏠</button>
+        </div>
+    `;
+}
+
+
+/* ========================================================= */
+/*                   РЕЖИМ 2: ИГРА В КАРТОЧКИ                */
+/* ========================================================= */
+
+function startCardsGame() {
+    const container = document.getElementById("gameContainer");
+    container.classList.add("wide-mode"); // Расширяем окно для сетки 4x3
+    
+    container.innerHTML = `
+        <h1>🃏 Paare finden</h1>
+        <div class="subtitle">Verbinde die passenden deutschen und französischen Begriffe!</div>
+
+        <div class="cards-grid" id="cardGrid"></div>
+
+        <div id="winMessage" style="display:none; margin-bottom: 20px;">
+            <h2>🎉 Отличный результат! Все пары найдены!</h2>
+            <button class="restart-btn" onclick="generateCards()">Nochmal spielen 🔄</button>
+        </div>
+
+        <button class="restart-btn" style="background: #666; margin-top:0;" onclick="backToMenu()">↩ Zum Hauptmenü</button>
+    `;
+    
+    generateCards();
+}
+
+function generateCards() {
+    const grid = document.getElementById("cardGrid");
+    const winMsg = document.getElementById("winMessage");
+    grid.innerHTML = "";
+    winMsg.style.display = "none";
+    matchesFound = 0;
+    firstSelected = null;
+    secondSelected = null;
+
+    // 1. Берем 6 случайных пар из нашего массива (чтобы вышло 12 карточек)
+    const shuffledPairs = [...questions].sort(() => Math.random() - 0.5);
+    const selectedPairs = shuffledPairs.slice(0, 6);
+
+    // 2. Формируем список из 12 одиночных карточек
+    let cardItems = [];
+    selectedPairs.forEach((pair, index) => {
+        cardItems.push({ text: pair[0], pairId: index }); // Немецкое слово
+        cardItems.push({ text: pair[1], pairId: index }); // Французское слово
+    });
+
+    // 3. Тщательно перемешиваем карточки между собой
+    cardItems.sort(() => Math.random() - 0.5);
+
+    // 4. Отрисовываем сетку карточек 4 в длину, 3 в ширину
+    cardItems.forEach(item => {
+        const cardElement = document.createElement("div");
+        cardElement.className = "card";
+        cardElement.textContent = item.text;
+        cardElement.dataset.pairId = item.pairId;
+
+        cardElement.onclick = () => {
+            if (cardElement.classList.contains('correct') || cardElement === firstSelected) return;
+            if (document.querySelectorAll('.card.wrong').length > 0) return; // Защита во время анимации ошибки
+
+            cardElement.classList.add('selected');
+
+            if (!firstSelected) {
+                firstSelected = cardElement;
+            } else {
+                secondSelected = cardElement;
+                checkCardMatch();
+            }
+        };
+
+        grid.appendChild(cardElement);
+    });
+}
+
+function checkCardMatch() {
+    if (firstSelected.dataset.pairId === secondSelected.dataset.pairId) {
+        // Ура, пара совпала!
+        firstSelected.classList.remove('selected');
+        secondSelected.classList.remove('selected');
+        firstSelected.classList.add('correct');
+        secondSelected.classList.add('correct');
+        
+        matchesFound++;
+        firstSelected = null;
+        secondSelected = null;
+
+        if (matchesFound === 6) {
+            setTimeout(() => {
+                document.getElementById("winMessage").style.display = "block";
+            }, 500);
+        }
+    } else {
+        // Ошибка — карточки не подходят друг к другу
+        firstSelected.classList.add('wrong');
+        secondSelected.classList.add('wrong');
+
+        setTimeout(() => {
+            firstSelected.classList.remove('selected', 'wrong');
+            secondSelected.classList.remove('selected', 'wrong');
+            firstSelected = null;
+            secondSelected = null;
+        }, 600);
+    }
+}
+
+</script>
+
+</body>
+</html>
